@@ -150,6 +150,16 @@ namespace NetMQ.Monitoring
         /// </summary>
         public event EventHandler<NetMQMonitorSocketEventArgs>? Disconnected;
 
+        /// <summary>
+        /// Occurs when the stream engine (TCP and IPC specific) detects a corrupted / broken session.
+        /// </summary>
+        public event EventHandler<NetMQMonitorClientEventArgs>? ClientDisconnected;
+
+        /// <summary>
+        /// Occurs when the stream engine (TCP and IPC specific) detects a corrupted / broken session.
+        /// </summary>
+        public event EventHandler<NetMQMonitorClientEventArgs>? ClientAccepted;
+
         #endregion
 
         private void Handle(object sender, NetMQSocketEventArgs socketEventArgs)
@@ -187,6 +197,12 @@ namespace NetMQ.Monitoring
                     break;
                 case SocketEvents.Disconnected:
                     InvokeEvent(Disconnected, new NetMQMonitorSocketEventArgs(this, monitorEvent.Addr, monitorEvent.ConvertArg<AsyncSocket>(), SocketEvents.Disconnected));
+                    break;
+                case SocketEvents.ClientAccepted:
+                    InvokeEvent(ClientAccepted, new NetMQMonitorClientEventArgs(this, monitorEvent.Addr, monitorEvent.ConvertArg<byte[]>(), SocketEvents.ClientAccepted));
+                    break;
+                case SocketEvents.ClientDisconnected:
+                    InvokeEvent(ClientDisconnected, new NetMQMonitorClientEventArgs(this, monitorEvent.Addr, monitorEvent.ConvertArg<byte[]>(), SocketEvents.ClientDisconnected));
                     break;
                 default:
                     throw new Exception("unknown event " + monitorEvent.Event);

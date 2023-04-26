@@ -10,6 +10,7 @@ namespace NetMQ.Core
     {
         private const int ValueInteger = 1;
         private const int ValueChannel = 2;
+        private const int ValueIdentity = 3;
 
         private readonly SocketEvents m_monitorEvent;
         private readonly string m_addr;
@@ -40,6 +41,11 @@ namespace NetMQ.Core
         {
         }
 
+        public MonitorEvent(SocketEvents monitorEvent, string addr, byte[] arg)
+            : this(monitorEvent, addr, (object)arg)
+        {
+        }
+
         public MonitorEvent(SocketEvents monitorEvent, string addr, AsyncSocket arg)
             : this(monitorEvent, addr, (object)arg)
         {
@@ -55,6 +61,8 @@ namespace NetMQ.Core
                 m_flag = ValueInteger;
             else if (arg is AsyncSocket)
                 m_flag = ValueChannel;
+            else if (arg is byte[])
+                m_flag = ValueIdentity;
             else
                 m_flag = 0;
         }
@@ -73,6 +81,8 @@ namespace NetMQ.Core
                 size += 4;
             else if (m_flag == ValueChannel)
                 size += s_sizeOfIntPtr;
+            else if (m_flag == ValueIdentity)
+                size += ((byte[])m_arg).Length + 4;
 
             int pos = 0;
 
@@ -105,6 +115,13 @@ namespace NetMQ.Core
                     buffer.PutInteger(Endianness.Little, GCHandle.ToIntPtr(handle).ToInt32(), pos);
                 else
                     buffer.PutLong(Endianness.Little, GCHandle.ToIntPtr(handle).ToInt64(), pos);
+            }
+            else if (m_flag == ValueIdentity)
+            {
+                buffer.PutInteger(Endianness.Little, ((byte[])m_arg).Length, pos);
+                pos += 4;
+                buffer.PutBytes((byte[])m_arg!, pos);
+                pos += ((byte[])m_arg).Length;
             }
 
             var msg = new Msg();
@@ -156,6 +173,19 @@ namespace NetMQ.Core
                 handle.Free();
 
                 arg = socket;
+            }
+            else if (flag == ValueIdentity)
+            {
+                var length = data.GetInteger(Endianness.Little, pos);
+                pos += 4;
+
+                if(length > 0)
+                {
+                    arg = new byte[length];
+                    data.CopyTo(pos, new ByteArraySegment((byte[])arg), 0, length);
+                    pos += length;
+                }
+
             }
 
             return new MonitorEvent(@event, addr, arg);

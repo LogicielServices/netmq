@@ -59,12 +59,22 @@ namespace NetMQ
         Disconnected = 512,
 
         /// <summary>
+        /// Peer is accepted as a Client
+        /// </summary>
+        ClientAccepted = 1024,
+
+        /// <summary>
+        /// Socket disconnected as a Client
+        /// </summary>
+        ClientDisconnected = 2048,
+
+        /// <summary>
         /// Listen to all events
         /// </summary>
         All = Connected | ConnectDelayed |
               ConnectRetried | Listening |
               BindFailed | Accepted |
               AcceptFailed | Closed |
-              CloseFailed | Disconnected
+              CloseFailed | Disconnected | ClientAccepted | ClientDisconnected
     }
 }

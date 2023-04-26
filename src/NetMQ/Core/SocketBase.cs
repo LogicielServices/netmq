@@ -1695,6 +1695,22 @@ namespace NetMQ.Core
             MonitorEvent(new MonitorEvent(SocketEvents.Disconnected, addr, ch));
         }
 
+        public void EventClientDisconnected(string addr, byte[] identity)
+        {
+            if ((m_monitorEvents & SocketEvents.ClientDisconnected) == 0)
+                return;
+
+            MonitorEvent(new MonitorEvent(SocketEvents.ClientDisconnected, addr, identity));
+        }
+
+        public void EventClientAccepted(string addr, byte[] identity)
+        {
+            if ((m_monitorEvents & SocketEvents.ClientAccepted) == 0)
+                return;
+
+            MonitorEvent(new MonitorEvent(SocketEvents.ClientAccepted, addr, identity));
+        }
+
         private void MonitorEvent(MonitorEvent monitorEvent)
         {
             if (m_monitorSocket == null)

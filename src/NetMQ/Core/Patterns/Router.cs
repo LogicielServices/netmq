@@ -216,6 +216,8 @@ namespace NetMQ.Core.Patterns
                 m_outpipes.TryGetValue(pipe.Identity, out Outpipe old);
                 m_outpipes.Remove(pipe.Identity);
 
+                EventClientDisconnected(m_options.LastEndpoint, pipe.Identity);
+
                 Debug.Assert(old != null);
 
                 m_fairQueueing.Terminated(pipe);
@@ -589,6 +591,7 @@ namespace NetMQ.Core.Patterns
             pipe.Identity = identity;
             // Add the record into output pipes lookup table
             var outpipe = new Outpipe(pipe, true);
+            EventClientAccepted(m_options.LastEndpoint, identity);
             m_outpipes.Add(identity, outpipe);
 
             return true;

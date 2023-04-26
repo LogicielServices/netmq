@@ -108,4 +108,29 @@ namespace NetMQ.Monitoring
         /// </summary>
         public int Interval { get; }
     }
+
+    /// <summary>
+    /// A subclass of <see cref="NetMQMonitorEventArgs"/> that also holds an Identity.
+    /// </summary>
+    public class NetMQMonitorClientEventArgs : NetMQMonitorEventArgs
+    {
+        /// <summary>
+        /// Create a new NetMQMonitorIntervalEventArgs containing the given NetMQMonitor, address, and interval.
+        /// </summary>
+        /// <param name="monitor">the NetMQMonitor</param>
+        /// <param name="address">The a string denoting the address</param>
+        /// <param name="identity"></param>
+        /// <param name="socketEvent">The type of socket event that occurred.</param>
+        public NetMQMonitorClientEventArgs(NetMQMonitor monitor, string address, byte[] identity, SocketEvents socketEvent)
+            : base(monitor, address, socketEvent)
+        {
+            Identity = identity;
+        }
+
+        /// <summary>
+        /// Gets the interval, in milliseconds.
+        /// </summary>
+        public byte[] Identity { get; }
+    }
+
 }
